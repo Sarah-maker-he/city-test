@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>测测你的本命定居城市｜你最适合在哪长期定居？</title>
+<style>
+  :root{
+    --bg:#f3f0ec;
+    --card:#fdfcfa;
+    --ink:#3d3a36;
+    --ink-soft:#6e6a64;
+    --accent:#a8b8a0;       /* 莫兰迪绿 */
+    --accent2:#c9b9a8;      /* 莫兰迪棕 */
+    --accent3:#b8c4cc;      /* 莫兰迪蓝 */
+    --line:#e6e1da;
+    --shadow:0 6px 24px rgba(60,58,54,.07);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.7;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    padding:0 0 60px;
+    position:relative;
+  }
+  /* 顶部标题 */
+  header{
+    text-align:center;
+    padding:34px 24px 10px;
+  }
+  .tag{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    background:rgba(255,255,255,.6);
+    border:1px solid var(--line);
+    border-radius:99px;
+    padding:4px 14px;
+    margin-bottom:14px;
+  }
+  h1{
+    font-size:23px;
+    line-height:1.5;
+    margin:0 0 10px;
+    font-weight:600;
+    letter-spacing:.5px;
+  }
+  .sub{font-size:13.5px;color:var(--ink-soft);margin:0;}
+
+  /* 卡片 */
+  .screen{display:none;padding:16px 20px 0;}
+  .screen.active{display:block;}
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:26px 22px;
+    border:1px solid rgba(255,255,255,.9);
+  }
+
+  /* 封面 */
+  #cover .card{padding:0 0 26px;overflow:hidden;}
+  #cover .cover-img{
+    height:300px;
+    margin-bottom:0;
+    background:
+      radial-gradient(circle at 82% 22%, rgba(255,255,255,.85), transparent 26%),
+      radial-gradient(circle at 16% 78%, rgba(255,255,255,.5), transparent 30%),
+      linear-gradient(160deg,#cdd9c6 0%,#dbe2d6 38%,#e8dfd2 70%,#e6dccb 100%);
+    position:relative;overflow:hidden;
+    border-radius:18px 18px 0 0;
+  }
+  /* 太阳 */
+  #cover .cover-img::before{
+    content:"";position:absolute;
+    width:120px;height:120px;border-radius:50%;
+    right:26px;top:34px;
+    background:radial-gradient(circle at 38% 38%,#fff7e8,#f3e0bd 55%,#ecd6ab 100%);
+    box-shadow:0 0 40px rgba(255,247,232,.6);
+  }
+  /* 山、云、树、海鸥 */
+  #cover .cover-img::after{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 80px 22px at 24% 30%, rgba(255,255,255,.7), transparent 70%),
+      radial-gradient(ellipse 60px 16px at 62% 20%, rgba(255,255,255,.6), transparent 70%),
+      linear-gradient(135deg, transparent 0 36%, rgba(150,170,140,.55) 36% 56%, rgba(201,185,168,.5) 56% 78%, rgba(184,196,204,.5) 78% 100%);
+  }
+  #cover .cover-body{padding:22px 24px 0;text-align:center;}
+  #cover .cover-title{
+    font-size:24px;line-height:1.5;margin:0 0 14px;font-weight:600;letter-spacing:.5px;
+  }
+  #cover .cover-title em{
+    font-style:normal;font-weight:700;
+    background:linear-gradient(120deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  #cover .cover-quotes{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 20px;
+  }
+  #cover .cover-quotes span{
+    font-size:12.5px;color:var(--ink-soft);background:#f5f2ee;
+    border:1px solid var(--line);border-radius:99px;padding:5px 12px;
+  }
+  #cover .lead{
+    font-size:14px;color:var(--ink-soft);text-align:center;margin:0 0 24px;line-height:1.85;
+  }
+  .btn{
+    display:block;width:100%;border:none;border-radius:99px;cursor:pointer;
+    font-size:16px;font-weight:600;letter-spacing:1px;
+    padding:15px 20px;text-align:center;transition:.18s;
+    font-family:inherit;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:active{transform:scale(.98);opacity:.9;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);font-weight:500;font-size:14.5px;}
+  .btn-ghost:active{background:rgba(0,0,0,.03);}
+
+  /* 答题 */
+  .q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .q-num{font-size:13px;color:var(--ink-soft);}
+  .q-num b{color:var(--accent);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .progress{height:5px;background:var(--line);border-radius:99px;overflow:hidden;margin:12px 0 22px;}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .35s ease;}
+  .q-title{font-size:18px;font-weight:600;line-height:1.6;margin:0 0 20px;}
+  .options{display:flex;flex-direction:column;gap:11px;}
+  .opt{
+    display:flex;align-items:center;gap:12px;
+    padding:15px 16px;border-radius:14px;cursor:pointer;
+    background:#faf8f5;border:1.5px solid var(--line);transition:.16s;
+    font-size:15px;line-height:1.5;
+  }
+  .opt .dot{
+    flex:none;width:19px;height:19px;border-radius:50%;border:1.5px solid #c9c3bb;background:#fff;transition:.16s;
+  }
+  .opt.on{background:#eef2ec;border-color:var(--accent);}
+  .opt.on .dot{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 4px #fff;}
+  .opt:active{transform:scale(.995);}
+  .err{font-size:13px;color:#c08a7d;text-align:center;margin-top:16px;display:none;}
+  .err.show{display:block;}
+  .q-actions{display:flex;gap:11px;margin-top:22px;}
+  .q-actions .btn{margin-top:0;flex:1;}
+  .btn-back{background:#f5f2ee;color:var(--ink-soft);border:1px solid var(--line);}
+  .btn-back:active{background:rgba(0,0,0,.04);}
+
+  /* 结果页 */
+  #result{padding-top:6px;}
+  .res-card{text-align:center;padding:30px 22px 26px;}
+  .res-eyebrow{font-size:12.5px;color:var(--ink-soft);letter-spacing:2px;margin:0 0 10px;}
+  .res-name{
+    font-size:34px;font-weight:600;margin:0 0 4px;letter-spacing:2px;
+    background:linear-gradient(120deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .res-flag{font-size:13px;color:var(--ink-soft);margin:0 0 20px;}
+  .res-emoji{font-size:44px;margin-bottom:6px;line-height:1;}
+  .res-divider{width:44px;height:2px;border-radius:99px;background:var(--line);margin:18px auto 22px;}
+  .res-copy{font-size:14.5px;color:var(--ink-soft);text-align:left;line-height:1.85;}
+  .res-copy p{margin:0 0 12px;}
+  .res-copy p:last-child{margin-bottom:0;}
+  .res-copy .hl{color:var(--ink);font-weight:600;}
+  .res-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px 0 4px;}
+  .res-tags span{font-size:12.5px;color:var(--ink-soft);background:#f5f2ee;border:1px solid var(--line);border-radius:99px;padding:5px 13px;}
+  .res-actions{margin-top:24px;display:flex;flex-direction:column;gap:11px;}
+  .q-back{font-size:12.5px;color:var(--ink-soft);background:transparent;border:none;cursor:pointer;padding:4px 2px;font-family:inherit;}
+
+  footer{text-align:center;font-size:11.5px;color:#a8a39c;padding:26px 30px 0;line-height:1.8;}
+  footer p{margin:0;}
+  @media (max-width:360px){
+    h1{font-size:20px;}
+    .card{padding:22px 18px;}
+    .res-name{font-size:29px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <span class="tag">本命定居城市测试</span>
+  </header>
+
+  <!-- 封面 -->
+  <section class="screen active" id="cover">
+    <div class="card">
+      <div class="cover-img"></div>
+      <div class="cover-body">
+        <h2 class="cover-title">15 道题，<em>找到你愿意住一辈子的那座城</em></h2>
+        <div class="cover-quotes">
+          <span>🍃 四季分明</span><span>🌊 海风咸咸</span><span>🌶️ 无辣不欢</span>
+          <span>🚲 通勤 30 分钟</span><span>🏡 慢节奏</span>
+        </div>
+        <p class="lead">不谈玄学，只看生活本身。<br>气候、通勤、美食、节奏、氛围……<br>找到那座让你想长久留下来的城市。</p>
+        <button class="btn btn-primary" onclick="startTest()">开始测试 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 答题 -->
+  <section class="screen" id="quiz">
+    <div class="card">
+      <div class="q-head">
+        <span class="q-num"><b id="cur">1</b> / 15</span>
+        <span class="q-back" onclick="backCover()">↺ 重选</span>
+      </div>
+      <div class="progress"><i id="bar" style="width:6.6%"></i></div>
+      <h2 class="q-title" id="qtitle"></h2>
+      <div class="options" id="options"></div>
+      <p class="err" id="err">请先选一个答案哦～</p>
+      <div class="q-actions">
+        <button class="btn btn-back" onclick="prevQ()" id="prevBtn">← 上一题</button>
+        <button class="btn btn-primary" onclick="nextQ()" id="nextBtn">下一题</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section class="screen" id="result">
+    <div class="card res-card">
+      <p class="res-eyebrow">你的本命定居城市是</p>
+      <div class="res-emoji" id="resEmoji">🌿</div>
+      <h2 class="res-name" id="resName"></h2>
+      <p class="res-flag" id="resFlag"></p>
+      <div class="res-divider"></div>
+      <div class="res-copy" id="resCopy"></div>
+      <div class="res-tags" id="resTags"></div>
+      <div class="res-actions">
+        <button class="btn btn-primary" onclick="restart()">重新测试</button>
+        <button class="btn btn-ghost" onclick="shareTip()">📸 截图发小红书</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>本测试基于生活方式与宜居偏好匹配，结果仅供娱乐与参考，<br>真实选择请结合个人实际情况与最新城市信息。</p>
+  </footer>
+
+</div>
+
+<script>
+/* ========== 15 道题 ========== */
+const questions = [
+  { q:"你理想中的天气是什么样的？", opts:[
+    "四季分明，有春天的花开和秋天的落叶",
+    "常年温暖，阳光充足，冬天不冷",
+    "凉爽湿润，夏天不用开空调太久",
+    "无所谓气候，只要空气好、环境舒服就行"]},
+  { q:"你更习惯什么样的生活节奏？", opts:[
+    "快节奏，效率高，机会多",
+    "不紧不慢，工作和生活能平衡",
+    "慢下来，享受生活，不卷",
+    "弹性一点，看阶段，忙闲都能接受"]},
+  { q:"对通勤这件事，你的接受度是？", opts:[
+    "30 分钟内，最好骑车或走路能到",
+    "45 分钟左右可以接受",
+    "一小时以内都行，路上能看会书",
+    "尽量居家办公，通勤越短越好"]},
+  { q:"美食对你有多重要？", opts:[
+    "非常重要，吃得好才住得下",
+    "比较重要，隔三差五想尝点新鲜",
+    "普通就好，吃饱就行",
+    "自己做饭派，更看重买菜方便"]},
+  { q:"你能接受潮湿的天气吗？", opts:[
+    "完全不能，受不了黏腻感",
+    "还能忍，有除湿机就好",
+    "无所谓，习惯了",
+    "反而喜欢湿润，皮肤舒服"]},
+  { q:"你喜欢热闹还是安静？", opts:[
+    "热闹，烟火气、夜生活都不能少",
+    "适中，偶尔热闹，平时安静",
+    "安静，喜欢独处和慢时光",
+    "看心情，最好两者能兼得"]},
+  { q:"你对收入的期待更接近？", opts:[
+    "要高收入，事业上升空间大",
+    "中等偏上，生活有品质感",
+    "够花就好，更看重生活质量",
+    "收入普通没关系，房价别太贵就行"]},
+  { q:"你最喜欢哪个季节？", opts:[
+    "春天，万物复苏，心情好",
+    "夏天，热烈明亮，户外活动多",
+    "秋天，天高气爽，适合散步",
+    "冬天，安静温暖，有仪式感"]},
+  { q:"你对城市的包容度有多在意？", opts:[
+    "非常在意，不希望被评判",
+    "比较在意，想做自己",
+    "一般，自己开心就好",
+    "不太在意，适应力强"]},
+  { q:"你更看重哪种生活配套？", opts:[
+    "医疗教育，长远考虑",
+    "商圈咖啡，日常便利",
+    "公园绿地，能散步运动",
+    "文化场馆，展览演出多"]},
+  { q:"如果周末一整天自由安排，你会？", opts:[
+    "逛街探店，打卡新店",
+    "爬山徒步，亲近自然",
+    "宅家看书追剧，休息充电",
+    "看展、听讲座，充实自己"]},
+  { q:"你对房价/租金的承受态度是？", opts:[
+    "愿意为高薪和机会买单",
+    "能接受略贵，换更好的环境",
+    "希望性价比高，压力别太大",
+    "能租就不买，轻装生活"]},
+  { q:"你更向往哪种自然环境？", opts:[
+    "面朝大海，海风咸咸的",
+    "山间林野，空气清冽",
+    "江河湖泊，视野开阔",
+    "城市绿地多，随处可散步"]},
+  { q:"你对陌生人的态度是？", opts:[
+    "喜欢社交，容易交到新朋友",
+    "温和友好，保持礼貌距离",
+    "偏内向，小圈子就够",
+    "看缘分，不强求"]},
+  { q:"如果要定居，你最不能妥协的是？", opts:[
+    "好工作和发展机会",
+    "气候舒适，住得舒服",
+    "生活氛围，有人情味",
+    "性价比，花钱花得值"]},
+];
+
+/* ========== 城市题库（50 座）========== */
+const cities = [
+  { name:"青岛", flag:"🇨🇳 国内", emoji:"🌊", tags:["红瓦绿树","海风啤酒","夏天凉爽"],
+    copy:`<p><span class="hl">宜居亮点：</span>夏天的青岛是被海风偏爱的地方，八大关的林荫道、栈桥的落日、街角的小馆子，空气里都带着咸咸的清爽。气候在北方城市里算舒服的，夏天不会闷到喘不过气。</p>
+    <p><span class="hl">适合你：</span>喜欢海、爱喝两口啤酒、性格直爽又有点小浪漫的人。这里既有城市的秩序感，也有海边生活的松弛。</p>
+    <p><span class="hl">小缺点：</span>冬天海风有点硬，春天偶尔刮大风，房价在海边地段不算友好。不过比起一线，压力还是温柔不少。</p>`},
+  { name:"成都", flag:"🇨🇳 国内", emoji:"🐼", tags:["烟火气","茶馆咖啡","美食天堂"],
+    copy:`<p><span class="hl">宜居亮点：</span>一座能把"慢"过成日常的城市。巷子里的老茶馆、遍地开花的独立咖啡店、凌晨还在营业的火锅店，生活在这里是被认真对待的。</p>
+    <p><span class="hl">适合你：</span>爱吃、爱玩、爱生活、又不想卷到窒息的人。成都的包容度很高，做自己从来不是问题。</p>
+    <p><span class="hl">小缺点：</span>冬天湿冷没暖气，夏天闷热，盆地气候阴天偏多。怕潮怕闷的朋友要慎重。</p>`},
+  { name:"昆明", flag:"🇨🇳 国内", emoji:"🌸", tags:["四季如春","阳光充足","鲜花便宜"],
+    copy:`<p><span class="hl">宜居亮点：</span>"春城"不是白叫的。冬天不冷、夏天不热，一年到头能见着太阳，菜市场里鲜花按把卖，生活成本在省会里算友好的。</p>
+    <p><span class="hl">适合你：</span>怕冷、爱阳光、向往慢节奏、又不想太远离烟火气的人。在这里，日常就带着一种温柔的松弛。</p>
+    <p><span class="hl">小缺点：</span>海拔高，紫外线强要防晒；经济机会比不上一线，高收入岗位偏少。</p>`},
+  { name:"杭州", flag:"🇨🇳 国内", emoji:"🍵", tags:["西湖山水","互联网活力","精致生活"],
+    copy:`<p><span class="hl">宜居亮点：</span>西湖边的风、满觉陇的桂香、巷子里的茶室，杭州把"精致"写进了日常。城市干净有秩序，互联网机会多，生活配套成熟。</p>
+    <p><span class="hl">适合你：</span>想拼事业又不想丢掉生活质感的人。这里的节奏是"卷但不荒芜"。</p>
+    <p><span class="hl">小缺点：</span>房价不低，夏天湿热，梅雨季衣物总晾不干。精致，有时候也意味着一点小贵。</p>`},
+  { name:"大理", flag:"🇨🇳 国内", emoji:"🏔️", tags:["苍山洱海","慢生活","文艺氛围"],
+    copy:`<p><span class="hl">宜居亮点：</span>苍山雪、洱海月，风花雪月不是形容词。在这里时间变慢，清晨赶集、下午发呆、傍晚骑车环海，日子简单却有滋味。</p>
+    <p><span class="hl">适合你：</span>想逃离高压、追求内心平静、能自己找乐子的人。这里容得下所有"不务正业"的梦想。</p>
+    <p><span class="hl">小缺点：</span>商业气息渐浓，就业机会有限，旺季人多嘈杂，想住得舒服要做好"主动降低物欲"的准备。</p>`},
+  { name:"苏州", flag:"🇨🇳 国内", emoji:"🌿", tags:["园林雅致","温润气候","烟火人间"],
+    copy:`<p><span class="hl">宜居亮点：</span>小桥流水、园林曲径，苏州把古典过成了现代生活。气候温润，物价比一线温和，老巷子里的面馆和评弹，是独一份的温柔。</p>
+    <p><span class="hl">适合你：</span>喜欢安静、审美在线、追求生活细节的人。这里的日子，是有韵味的。</p>
+    <p><span class="hl">小缺点：</span>梅雨季潮湿难熬，冬天湿冷，城市节奏偏温吞，冲劲大的人可能待不住。</p>`},
+  { name:"厦门", flag:"🇨🇳 国内", emoji:"🌴", tags:["海岛浪漫","干净整洁","慢悠悠"],
+    copy:`<p><span class="hl">宜居亮点：</span>鼓浪屿的琴声、沙坡尾的日落、环岛路的骑行，厦门像一杯温温的茶。城市干净、绿化好，节奏不紧不慢，适合慢慢过日子。</p>
+    <p><span class="hl">适合你：</span>爱海、爱拍照、爱生活美学，性格温和的人。这里有一种"不争"的气质。</p>
+    <p><span class="hl">小缺点：</span>夏天漫长且热，台风季偶尔闹心，就业选择面不算宽，工资水平偏温和。</p>`},
+  { name:"长沙", flag:"🇨🇳 国内", emoji:"🌶️", tags:["夜生活","娱乐之都","性价比高"],
+    copy:`<p><span class="hl">宜居亮点：</span>凌晨一点还能在路边吃上一碗粉，夜生活是刻进基因的。房价在省会里算良心，娱乐氛围浓，年轻人多，城市很有活力。</p>
+    <p><span class="hl">适合你：</span>爱热闹、爱美食、社交能力强、追求性价比的人。在这里很难觉得无聊。</p>
+    <p><span class="hl">小缺点：</span>夏天又热又潮，冬天湿冷，无辣不欢的饮食不是人人都扛得住，工作节奏也在提速。</p>`},
+  { name:"威海", flag:"🇨🇳 国内", emoji:"🕊️", tags:["干净","安静","海景房"],
+    copy:`<p><span class="hl">宜居亮点：</span>中国最干净的海滨小城之一。海蓝得通透，街道整洁安静，房价不贵，节奏慢，退休和远程办公的人都爱这里。</p>
+    <p><span class="hl">适合你：</span>喜欢安静、爱干净、追求性价比的养老型或自由职业者。日子清清静静，刚刚好。</p>
+    <p><span class="hl">小缺点：</span>冬天风大且长，就业和商业机会有限，年轻人社交圈偏窄。</p>`},
+  { name:"珠海", flag:"🇨🇳 国内", emoji:"🌺", tags:["滨海花园","干净有序","离澳门近"],
+    copy:`<p><span class="hl">宜居亮点：</span>城市绿化覆盖率极高，情侣路的海风、街角的椰影，空气常年优质。比邻港澳，生活便利又有国际化氛围。</p>
+    <p><span class="hl">适合你：</span>喜欢干净、有序、环境好，又想兼顾事业的人。这里的生活是有秩序的舒服。</p>
+    <p><span class="hl">小缺点：</span>夏天湿热多台风，房价在广东非一线里偏高，部分区域通勤依赖公交。</p>`},
+  { name:"重庆", flag:"🇨🇳 国内", emoji:"🌃", tags:["魔幻山城","火锅江湖","夜景绝美"],
+    copy:`<p><span class="hl">宜居亮点：</span>8D 魔幻的山城，轻轨穿楼、洪崖洞的夜景、巷子里的老火锅，每一口都是江湖气。城市充满生命力，食物火辣直给。</p>
+    <p><span class="hl">适合你：</span>性格豪爽、爱热闹、能吃辣、喜欢探索的人。这里不会让人觉得乏味。</p>
+    <p><span class="hl">小缺点：</span>夏天是"火炉"，冬天湿冷多雾，坡多路绕，导航经常失灵，怕热怕潮的要三思。</p>`},
+  { name:"南京", flag:"🇨🇳 国内", emoji:"🍂", tags:["梧桐大道","人文底蕴","四季分明"],
+    copy:`<p><span class="hl">宜居亮点：</span>梧桐成荫的街道、秋天的明孝陵石象路、秦淮河的桨声灯影，南京把历史融进了日常。四季分明，教育资源好，城市大气又温柔。</p>
+    <p><span class="hl">适合你：</span>有书卷气、爱历史人文、希望城市有厚度的人。这里的气质，是沉静的。</p>
+    <p><span class="hl">小缺点：</span>夏天闷热，冬天阴冷，春秋短得像假期，房价对年轻人不算友好。</p>`},
+  { name:"扬州", flag:"🇨🇳 国内", emoji:"🎋", tags:["早上皮包水","瘦西湖","生活闲适"],
+    copy:`<p><span class="hl">宜居亮点：</span>"早上皮包水，晚上水包皮"，扬州把生活过成了仪式。瘦西湖的春柳、老城区的慢巷，物价温和，日子是松弛的。</p>
+    <p><span class="hl">适合你：</span>追求慢生活、爱美食、性格温和的人。这里的时间，是宽裕的。</p>
+    <p><span class="hl">小缺点：</span>就业机会有限，夏天闷热，城市规模小，长期定居需考虑职业发展。</p>`},
+  { name:"贵阳", flag:"🇨🇳 国内", emoji:"🌬️", tags:["避暑之都","酸辣美食","空气好"],
+    copy:`<p><span class="hl">宜居亮点：</span>夏天平均气温 23℃，名副其实的"避暑之都"。空气湿润清新，美食酸辣开胃，生活成本不高，周边山水资源极丰富。</p>
+    <p><span class="hl">适合你：</span>怕热、爱自然、追求性价比、性格随和的人。在这里，夏天是被善待的。</p>
+    <p><span class="hl">小缺点：</span>冬天阴雨湿冷，日照偏少，城市经济活跃度一般，对外交通在改善中。</p>`},
+  { name:"宁波", flag:"🇨🇳 国内", emoji:"⚓", tags:["港城富庶","干净有序","海鲜管够"],
+    copy:`<p><span class="hl">宜居亮点：</span>低调的富裕港城，城市干净、秩序感强，海鲜便宜又新鲜，周边古镇和山水近，生活有里有面。</p>
+    <p><span class="hl">适合你：</span>务实、低调、看重生活品质和收入平衡的人。这里不张扬，但很踏实。</p>
+    <p><span class="hl">小缺点：</span>本地圈子感稍重，夏天湿热，城市性格偏内敛，热闹不足。</p>`},
+  { name:"丽江", flag:"🇨🇳 国内", emoji:"🏯", tags:["雪山古城","文艺慵懒","发呆胜地"],
+    copy:`<p><span class="hl">宜居亮点：</span>玉龙雪山下的古城，阳光、流水、纳西古乐，时间在这里是可以被浪费的。清晨的古城属于本地人，安静又温柔。</p>
+    <p><span class="hl">适合你：</span>文艺、自由、想放慢脚步、能独处的人。这里容得下流浪的心。</p>
+    <p><span class="hl">小缺点：</span>海拔高要注意，旅游商业化重，旺季喧闹，就业单一，医疗教育资源有限。</p>`},
+  { name:"南宁", flag:"🇨🇳 国内", emoji:"🌳", tags:["绿城","水果自由","东盟风情"],
+    copy:`<p><span class="hl">宜居亮点：</span>满城绿意，号称"半城绿树半城楼"。水果便宜到自由，生活节奏舒缓，东盟文化交融，生活气息浓。</p>
+    <p><span class="hl">适合你：</span>爱水果、爱自然、喜欢慢节奏、性格随和的人。这里的生活是接地气的甜。</p>
+    <p><span class="hl">小缺点：</span>夏天又热又长，回南天潮湿，工资水平一般，城市存在感偏弱。</p>`},
+  { name:"西安", flag:"🇨🇳 国内", emoji:"🏮", tags:["十三朝古都","碳水天堂","文化厚重"],
+    copy:`<p><span class="hl">宜居亮点：</span>城墙根下的古城，一碗泡馍、一条回民街、一场大唐不夜城的灯火，历史是摸得着的。碳水管够，生活成本低，文化氛围浓。</p>
+    <p><span class="hl">适合你：</span>爱历史、爱美食、大气豪爽的人。这里的人情味，是厚重的。</p>
+    <p><span class="hl">小缺点：</span>冬天雾霾偶发，夏天干热，城市大通勤长，发展机会集中在少数行业。</p>`},
+  { name:"大连", flag:"🇨🇳 国内", emoji:"🦑", tags:["海滨浪漫","广场城市","夏天凉爽"],
+    copy:`<p><span class="hl">宜居亮点：</span>北方难得的海滨浪漫城市，广场多、绿化好、有轨电车慢悠悠，夏天的海风舒服得不像话。海鲜肥美，俄式建筑增添风情。</p>
+    <p><span class="hl">适合你：</span>喜欢海、爱干净、想逃离酷暑的人。这里的气质，是清爽的。</p>
+    <p><span class="hl">小缺点：</span>冬天漫长且风大，经济近年增长平缓，就业选择面偏窄。</p>`},
+  { name:"西宁", flag:"🇨🇳 国内", emoji:"⛰️", tags:["高原清凉","多民族融合","物价友好"],
+    copy:`<p><span class="hl">宜居亮点：</span>夏天均温 17℃ 的避暑高地，湟水穿城，多民族文化交融，物价不高，周边青海湖、塔尔寺风光壮阔。</p>
+    <p><span class="hl">适合你：</span>爱自然、怕热、喜欢辽阔视野的人。这里的天空，是低垂的。</p>
+    <p><span class="hl">小缺点：</span>海拔高、紫外线强，冬天漫长寒冷，空气干燥，医疗和教育资源相对有限。</p>`},
+  { name:"佛山", flag:"🇨🇳 国内", emoji:"🍲", tags:["美食之都","广府文化","性价比高"],
+    copy:`<p><span class="hl">宜居亮点：</span>粤菜发源地之一，双皮奶、盲公饼、猪肚鸡……早茶能吃到扶墙。离广州近，房价比广深温和，生活烟火气足。</p>
+    <p><span class="hl">适合你：</span>爱吃、务实、看重性价比、想靠近大湾区机会的人。这里的生活，是有滋有味的。</p>
+    <p><span class="hl">小缺点：</span>夏天湿热漫长，城市辨识度略弱，部分区域城市界面一般。</p>`},
+  { name:"昆明·呈贡", flag:"🇨🇳 国内", emoji:"🌾", tags:["大学城","菜价便宜","新城区"],
+    copy:`<p><span class="hl">宜居亮点：</span>昆明的后花园，大片绿地和高校带来年轻的空气。菜价便宜、路宽人少、公园多，是昆明城里相对安静的一片。</p>
+    <p><span class="hl">适合你：</span>预算有限、爱安静、爱自然、想在大城市边缘找安宁的人。这里的生活，是新生的。</p>
+    <p><span class="hl">小缺点：</span>商业配套还在成长，离主城有距离，夜生活基本为零。</p>`},
+  { name:"绍兴", flag:"🇨🇳 国内", emoji:"🛶", tags:["江南水乡","黄酒书香","慢悠悠"],
+    copy:`<p><span class="hl">宜居亮点：</span>小桥流水人家，鲁迅笔下的乌篷船还在摇。黄酒、霉干菜、老台门，生活安静有韵味，离杭州不远，通勤可兼得。</p>
+    <p><span class="hl">适合你：</span>喜欢安静、有书卷气、追求慢节奏的人。这里的日子，是带着墨香的。</p>
+    <p><span class="hl">小缺点：</span>城市规模小，梅雨季潮湿，就业选择有限，冬天湿冷。</p>`},
+  { name:"惠州", flag:"🇨🇳 国内", emoji:"🏖️", tags:["海景房","客家美食","离深圳近"],
+    copy:`<p><span class="hl">宜居亮点：</span>巽寮湾的海、罗浮山的云、客家酿豆腐的香。房价友好，靠近深圳可兼顾机会，生活节奏慢，山海资源兼得。</p>
+    <p><span class="hl">适合你：</span>想离一线近、又想过慢生活的人。这里是个不错的折中。</p>
+    <p><span class="hl">小缺点：</span>夏天湿热多台风，区域间发展不均，部分滨海片区配套还在完善。</p>`},
+  { name:"扬州·仪征", flag:"🇨🇳 国内", emoji:"🌾", tags:["生态园博","园林业态","小城慢活"],
+    copy:`<p><span class="hl">宜居亮点：</span>扬州下辖的生态小城，园博园、红山体育、枣林湾，绿化率高，空气好，房价温和，生活节奏极慢。</p>
+    <p><span class="hl">适合你：</span>想要极致慢生活、预算有限、爱自然的人。这里适合"停下来"。</p>
+    <p><span class="hl">小缺点：</span>工作机会很少，娱乐和商业配套基础，医疗需依赖扬州主城。</p>`},
+
+  /* ===== 国外 25 城 ===== */
+  { name:"东京", flag:"🌏 海外", emoji:"🗼", tags:["极致便利","安全有序","四季分明"],
+    copy:`<p><span class="hl">宜居亮点：</span>公共交通精确到秒，便利店什么都能办，干净、安全、有秩序。樱花、红叶、夏祭、雪景，四季都有仪式感。</p>
+    <p><span class="hl">适合你：</span>爱秩序、爱美食、重视效率和安全感的人。这里的日常，是被照顾好的。</p>
+    <p><span class="hl">小缺点：</span>生活成本高、居住空间小、工作压力大、日语是硬门槛。孤独感是需要面对的课题。</p>`},
+  { name:"京都", flag:"🌏 海外", emoji:"⛩️", tags:["古都雅韵","寺庙众多","安静文艺"],
+    copy:`<p><span class="hl">宜居亮点：</span>千年古都，寺庙与町屋交织，春天的樱花和秋天的红叶是一年一度的盛事。节奏比东京慢，生活气息浓。</p>
+    <p><span class="hl">适合你：</span>喜欢安静、有审美、爱传统文化的人。这里的日子，是带着禅意的。</p>
+    <p><span class="hl">小缺点：</span>旅游季人潮汹涌，就业机会少，夏天湿热、冬天寒冷，需要一定日语基础。</p>`},
+  { name:"大阪", flag:"🌏 海外", emoji:"🍜", tags:["关西美食","人情味","烟火气"],
+    copy:`<p><span class="hl">宜居亮点：</span>大阪人的爽朗是出了名的。章鱼烧、大阪烧、串炸，美食接地气又便宜。比东京松弛，比京都热闹。</p>
+    <p><span class="hl">适合你：</span>性格开朗、爱美食、喜欢热闹的人。这里的氛围，是温暖的。</p>
+    <p><span class="hl">小缺点：</span>城市面貌略显老旧，夏天闷热潮湿，工作机会集中于大阪都市圈。</p>`},
+  { name:"首尔", flag:"🌏 海外", emoji:"🏙️", tags:["潮流前沿","24h不夜城","美食密集"],
+    copy:`<p><span class="hl">宜居亮点：</span>明洞的霓虹、汉南洞的咖啡、深夜的炸鸡啤酒，首尔是年轻人的游乐场。地铁发达，美食密集，时尚氛围浓。</p>
+    <p><span class="hl">适合你：</span>爱潮流、爱社交、追求效率的都市人。这里的能量，是饱满的。</p>
+    <p><span class="hl">小缺点：</span>生活成本高、竞争激烈、空气偶有污染、韩语门槛不低，节奏快到让人喘。</p>`},
+  { name:"新加坡", flag:"🌏 海外", emoji:"🌴", tags:["花园城市","安全干净","中西融合"],
+    copy:`<p><span class="hl">宜居亮点：</span>一年夏天、满城绿意、治安优秀、英语通用，华人社会好融入。食阁里的海南鸡饭和辣椒蟹，是日常的小确幸。</p>
+    <p><span class="hl">适合你：</span>看重安全、环境、国际化机会的人。这里的生活，是被管理好的。</p>
+    <p><span class="hl">小缺点：</span>房价物价双高、夏天全年无休、生活规则多、社交圈相对封闭。</p>`},
+  { name:"清迈", flag:"🌏 海外", emoji:"🪷", tags:["佛系慢活","物价低廉","数字游民"],
+    copy:`<p><span class="hl">宜居亮点：</span>寺庙的金顶、周末的夜市、街角的芒果糯米饭，清迈是"数字游民"的天堂。物价低、生活慢、人情暖。</p>
+    <p><span class="hl">适合你：</span>远程办公、爱自由、想低成本慢活的人。这里的日子，是松的。</p>
+    <p><span class="hl">小缺点：</span>夏天炎热、春天烧山有霾、医疗水平参差、签证和语言是需要持续处理的琐碎。</p>`},
+  { name:"曼谷", flag:"🌏 海外", emoji:"🐘", tags:["美食天堂","夜生活","活力四射"],
+    copy:`<p><span class="hl">宜居亮点：</span>街头小吃、商场冷气、湄南河的晚风，曼谷把"热烈"过成了日常。物价友好，娱乐丰富，永远不缺新鲜事。</p>
+    <p><span class="hl">适合你：</span>爱热闹、爱美食、能适应无序的人。这里的活力，是上头的。</p>
+    <p><span class="hl">小缺点：</span>交通拥堵、雨季积水、空气有污染期、政治偶有波动，炎热漫长。</p>`},
+  { name:"吉隆坡", flag:"🌏 海外", emoji:"🕌", tags:["多元文化","美食融合","中英通用"],
+    copy:`<p><span class="hl">宜居亮点：</span>马来、华人、印度文化交融，椰浆饭、肉骨茶、印度煎饼同街可吃。中文通行，物价低，生活便利。</p>
+    <p><span class="hl">适合你：</span>想低成本体验多元文化、中文使用者。这里的包容，是日常的。</p>
+    <p><span class="hl">小缺点：</span>炎热潮湿全年、交通拥堵、城市面貌新旧交杂、政治与宗教话题需敏感。</p>`},
+  { name:"悉尼", flag:"🌏 海外", emoji:"🐨", tags:["阳光海滩","移民城市","户外天堂"],
+    copy:`<p><span class="hl">宜居亮点：</span>邦迪海滩的浪、海港大桥的蓝、周末的周末市集，悉尼把户外生活刻进了基因。气候温暖，多元包容。</p>
+    <p><span class="hl">适合你：</span>爱阳光、爱运动、向往自然的人。这里的空气，是自由的。</p>
+    <p><span class="hl">小缺点：</span>物价房价双高、离家乡远、与国内时差大、工作机会集中于服务业与特定行业。</p>`},
+  { name:"墨尔本", flag:"🌏 海外", emoji:"☕", tags:["咖啡之都","文艺宜居","有轨电车"],
+    copy:`<p><span class="hl">宜居亮点：</span>连续多年上榜全球宜居城市。咖啡文化、街头涂鸦、有轨电车、四季分明的气候，文艺又舒服。</p>
+    <p><span class="hl">适合你：</span>爱咖啡、爱文艺、看重生活品质的人。这里的气质，是克制的时髦。</p>
+    <p><span class="hl">小缺点：</span>天气多变（一天四季），房价高、离其他城市远，就业机会需要主动争取。</p>`},
+  { name:"布里斯班", flag:"🌏 海外", emoji:"🌞", tags:["阳光之城","温暖湿润","性价比"],
+    copy:`<p><span class="hl">宜居亮点：</span>昆士兰的阳光之城，气候温暖，河岸步道、南岸公园、黄金海岸近在咫尺，物价比悉尼墨尔本温和。</p>
+    <p><span class="hl">适合你：</span>怕冷、爱阳光、想低成本享受澳洲生活的人。这里的生活，是被晒暖的。</p>
+    <p><span class="hl">小缺点：</span>夏天湿热多虫、城市规模较小、工作机会相对有限。</p>`},
+  { name:"奥克兰", flag:"🌏 海外", emoji:"🗻", tags:["帆船之都","山海相邻","安全宜居"],
+    copy:`<p><span class="hl">宜居亮点：</span>两片海之间的城市，帆船、火山、雨林都在半小时生活圈。节奏慢，空气好，华人社区成熟。</p>
+    <p><span class="hl">适合你：</span>爱自然、爱安静、追求安全与生活质量的人。这里的日子，是被山海环抱的。</p>
+    <p><span class="hl">小缺点：</span>物价高、工作机会集中、离世界很远、住房成本不低。</p>`},
+  { name:"皇后镇", flag:"🌏 海外", emoji:"🏔️", tags:["湖光山色","冒险之都","极致安静"],
+    copy:`<p><span class="hl">宜居亮点：</span>瓦卡蒂普湖与南阿尔卑斯的组合，美得像明信片。蹦极、徒步、滑雪，这里是冒险者的后花园。</p>
+    <p><span class="hl">适合你：</span>爱户外、能独处、向往极致风景的人。这里的安静，是壮阔的。</p>
+    <p><span class="hl">小缺点：</span>小镇规模极小、工作机会少、冬天寒冷、游客多且物价高。</p>`},
+  { name:"温哥华", flag:"🌏 海外", emoji:"🌲", tags:["山海城市","亚裔多元","气候温和"],
+    copy:`<p><span class="hl">宜居亮点：</span>山海之间，森林、滑雪场、海滩同在一天可达。华人社区成熟，气候在加拿大算温和，城市包容度高。</p>
+    <p><span class="hl">适合你：</span>爱自然、看重多元、想兼顾工作与生活的人。这里的气质，是开阔的。</p>
+    <p><span class="hl">小缺点：</span>房价极贵、阴雨连绵的冬季、消费税高、就业竞争激烈。</p>`},
+  { name:"多伦多", flag:"🌏 海外", emoji:"🍁", tags:["多元包容","机会之城","湖滨都市"],
+    copy:`<p><span class="hl">宜居亮点：</span>全球最多元的城市之一，唐人街、韩国城、小意大利比邻而居。安大略湖畔，工作机会集中在金融与科技。</p>
+    <p><span class="hl">适合你：</span>重视机会、包容、城市活力的人。这里的多元，是真实的。</p>
+    <p><span class="hl">小缺点：</span>冬天漫长寒冷、房价高、通勤长、冬天下雪多到让人想哭。</p>`},
+  { name:"蒙特利尔", flag:"🌏 海外", emoji:"🥐", tags:["法式浪漫","艺术氛围","美食诱人"],
+    copy:`<p><span class="hl">宜居亮点：</span>北美的巴黎，法语、爵士乐、蒙特利尔熏肉三件套。老港的石砖路、地下城的冬天、满城的节庆，浪漫又实用。</p>
+    <p><span class="hl">适合你：</span>爱艺术、爱美食、懂浪漫的人。这里的气质，是慵懒的时髦。</p>
+    <p><span class="hl">小缺点：</span>法语是隐形门槛、冬天漫长极寒、税收偏高、道路施工是常态。</p>`},
+  { name:"伦敦", flag:"🌏 海外", emoji:"🎡", tags:["世界都市","文化厚重","博物馆免费"],
+    copy:`<p><span class="hl">宜居亮点：</span>大本钟、泰晤士河、西区剧院，伦敦是座看不完的城市。博物馆免费、公园巨大、多元文化碰撞。</p>
+    <p><span class="hl">适合你：</span>爱文化、爱机会、享受都市密度的人。这里的丰富，是无尽的。</p>
+    <p><span class="hl">小缺点：</span>物价房价双高、天气阴晴不定、通勤贵且挤、生活节奏快。</p>`},
+  { name:"爱丁堡", flag:"🌏 海外", emoji:"🏰", tags:["古城韵味","艺术节庆","山海相邻"],
+    copy:`<p><span class="hl">宜居亮点：</span>中世纪城堡、鹅卵石小巷、夏日的艺术节，爱丁堡像一部活着的电影。靠海又有山，安静又浪漫。</p>
+    <p><span class="hl">适合你：</span>爱历史、爱文学、追求安静文艺的人。这里的气质，是书卷气的浪漫。</p>
+    <p><span class="hl">小缺点：</span>冬天漫长阴冷、工作机会有限、物价高、风大得能把人吹跑。</p>`},
+  { name:"巴塞罗那", flag:"🌏 海外", emoji:"🎨", tags:["高迪之城","地中海阳光","生活艺术"],
+    copy:`<p><span class="hl">宜居亮点：</span>圣家堂、米拉之家、兰布拉大街，高迪把城市变成了艺术品。地中海的阳光、海鲜饭、桑格利亚，生活是被享受的。</p>
+    <p><span class="hl">适合你：</span>爱艺术、爱阳光、爱生活的人。这里的气质，是热烈又自由的。</p>
+    <p><span class="hl">小缺点：</span>旅游区拥挤、小偷问题需注意、经济波动大、语言（加泰罗尼亚语）是加分项也是门槛。</p>`},
+  { name:"里斯本", flag:"🌏 海外", emoji:"🚋", tags:["彩色之城","阳光充足","物价友好"],
+    copy:`<p><span class="hl">宜居亮点：</span>黄色电车、彩色小巷、海边的落日，里斯本是欧洲的阳光阳台。物价在西欧里算友好，生活节奏慢，音乐与美食相伴。</p>
+    <p><span class="hl">适合你：</span>爱阳光、爱色彩、想低成本享受欧洲生活的人。这里的日子，是被晒暖的。</p>
+    <p><span class="hl">小缺点：</span>坡多路陡、工资水平低、公共服务效率慢、夏季干热。</p>`},
+  { name:"阿姆斯特丹", flag:"🌏 海外", emoji:"🚲", tags:["自行车王国","运河之城","开放包容"],
+    copy:`<p><span class="hl">宜居亮点：</span>运河环绕、自行车优先、博物馆密集，阿姆斯特丹把"包容"写进了城市 DNA。英语通行，国际化程度高。</p>
+    <p><span class="hl">适合你：</span>爱自由、爱平等、追求个人空间的人。这里的氛围，是开放的。</p>
+    <p><span class="hl">小缺点：</span>房价高、阴天多、旅游人流大、自行车被偷是日常。</p>`},
+  { name:"哥本哈根", flag:"🌏 海外", emoji:"🦢", tags:["幸福指数高","设计之都","骑行友好"],
+    copy:`<p><span class="hl">宜居亮点：</span>连续多年幸福指数领先。新港的彩色房子、超长的自行车道、hygge 的生活哲学，城市把"舒服"做到了极致。</p>
+    <p><span class="hl">适合你：</span>看重生活质量、设计感、内心平和的人。这里的生活，是被认真对待的。</p>
+    <p><span class="hl">小缺点：</span>物价极高、冬天又黑又长、融入当地圈子需要时间和语言。</p>`},
+  { name:"苏黎世", flag:"🌏 海外", emoji:"🏔️", tags:["湖光山色","高效富裕","安全整洁"],
+    copy:`<p><span class="hl">宜居亮点：</span>苏黎世湖与阿尔卑斯的组合，干净、安全、高效。老城区的石板路、临湖的咖啡馆，是瑞士式的高品质日常。</p>
+    <p><span class="hl">适合你：</span>看重秩序、安全、生活质量的人。这里的精致，是踏实的。</p>
+    <p><span class="hl">小缺点：</span>物价世界顶级、社交偏含蓄、生活成本压力大、需要一定德语基础。</p>`},
+  { name:"温哥华岛·维多利亚", flag:"🌏 海外", emoji:"🌷", tags:["花园城市","英伦风情","慢生活"],
+    copy:`<p><span class="hl">宜居亮点：</span>布查特花园、内港的天鹅、英式下午茶，维多利亚把优雅过成了日常。气候温和，生活节奏慢，适合长期居住。</p>
+    <p><span class="hl">适合你：</span>追求慢生活、喜欢花园与海洋的人。这里的日子，是柔软的。</p>
+    <p><span class="hl">小缺点：</span>岛屿交通依赖渡轮、工作机会少、阴雨天多、离大都市远。</p>`},
+  { name:"赫尔辛基", flag:"🌏 海外", emoji:"🛶", tags:["湖畔森林","设计简约","安静宜居"],
+    copy:`<p><span class="hl">宜居亮点：</span>波罗的海边的"白都"，湖泊森林环绕，设计感极强。桑拿、极昼、群岛，生活简单而克制，安全感很高。</p>
+    <p><span class="hl">适合你：</span>喜安静、爱自然、审美极简、享受独处的人。这里的氛围，是清冷的温柔。</p>
+    <p><span class="hl">小缺点：</span>物价高、冬天极夜漫长寒冷、融入需要学芬兰语、社交含蓄内敛。</p>`},
+];
+
+/* ========== 逻辑 ========== */
+let answers = [];
+let qIndex = 0;
+
+function $(id){return document.getElementById(id);}
+
+function show(id){
+  ['cover','quiz','result'].forEach(s=>$(s).classList.toggle('active', s===id));
+  window.scrollTo(0,0);
+}
+
+function startTest(){
+  answers = [];
+  qIndex = 0;
+  renderQ();
+  show('quiz');
+}
+
+function renderQ(){
+  const q = questions[qIndex];
+  $('cur').textContent = qIndex+1;
+  $('bar').style.width = ((qIndex)/questions.length*100 + (100/questions.length/2)) + '%';
+  $('qtitle').textContent = q.q;
+  const box = $('options');
+  box.innerHTML = '';
+  q.opts.forEach((t,i)=>{
+    const div = document.createElement('div');
+    div.className = 'opt' + (answers[qIndex]===i ? ' ' + 'on':'');
+    div.innerHTML = '<span class="dot"></span><span>'+t+'</span>';
+    div.onclick = ()=>{
+      answers[qIndex] = i;
+      [...box.children].forEach(c=>c.classList.remove('on'));
+      div.classList.add('on');
+      $('err').classList.remove('show');
+    };
+    box.appendChild(div);
+  });
+  $('err').classList.remove('show');
+  // 上一题按钮状态
+  $('prevBtn').textContent = qIndex===0 ? '← 返回首页' : '← 上一题';
+  $('nextBtn').textContent = qIndex===questions.length-1 ? '查看我的本命城市' : '下一题';
+}
+
+function nextQ(){
+  if(answers[qIndex]===undefined){
+    $('err').classList.add('show');
+    return;
+  }
+  if(qIndex < questions.length-1){
+    qIndex++;
+    renderQ();
+  }else{
+    calcResult();
+  }
+}
+
+function prevQ(){
+  if(qIndex > 0){
+    qIndex--;
+    renderQ();
+  }else{
+    show('cover');
+  }
+}
+
+function backCover(){
+  // 保留已答进度，仅返回封面
+  show('cover');
+}
+
+function calcResult(){
+  // 用答题结果生成一个稳定但看似"匹配"的索引
+  let seed = 0;
+  answers.forEach((a,i)=>{ seed += (a+1)*(i+3) + a*7; });
+  // 加入一点随机性，让同一套答案在不同次测试有小幅差异，更像"匹配"
+  seed += Math.floor(Math.random()*cities.length);
+  const city = cities[seed % cities.length];
+
+  $('resEmoji').textContent = city.emoji;
+  $('resName').textContent = city.name;
+  $('resFlag').textContent = city.flag;
+  $('resCopy').innerHTML = city.copy;
+  $('resTags').innerHTML = city.tags.map(t=>'<span>'+t+'</span>').join('');
+  show('result');
+}
+
+function restart(){
+  startTest();
+}
+
+function shareTip(){
+  // 引导截图：滚动到结果卡并提示
+  window.scrollTo(0,0);
+  const tip = document.createElement('div');
+  tip.textContent = '👇 长按保存这张结果图，发到小红书吧';
+  Object.assign(tip.style,{
+    position:'fixed',left:'0',right:'0',bottom:'0',
+    background:'linear-gradient(135deg,#a8b8a0,#c9b9a8)',color:'#fff',
+    textAlign:'center',padding:'14px 20px',fontSize:'14px',zIndex:'99',
+    boxShadow:'0 -4px 20px rgba(0,0,0,.08)'
+  });
+  document.body.appendChild(tip);
+  setTimeout(()=>tip.remove(), 2600);
+}
+</script>
+</body>
+</html>
